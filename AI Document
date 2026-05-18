@@ -92,12 +92,14 @@ The engine includes a dynamic calculator to predict the "New Average Cost" befor
 
 ### **Iteration 6: Automated Market Scanning (Current)**
 
-* **Prompt:** Add a "Recommend Stocks" tab for top 10 performance ranking and limit buy parameters.
+* **Prompt:** Add a "Recommend Stocks" tab for top 10 performance ranking with MTD/YTD context and multi-layer buy parameters (PS Strategy + EMA 20/50).
 * **Updates:**
-    * **New Feature:** Implemented a `get_recommendations()` engine that scans a preset list of high-volume stocks (AAPL, MSFT, NVDA, etc.).
-    * **Market Logic:** Added a 5-day performance calculation to rank and display the top 10 "movers."
-    * **Strategy Integration:** Applied the **PS Limit Buy I & II** formulas to each recommended stock to provide instant, actionable entry targets.
-    * **Tab Architecture:** Expanded the main UI to 4 tabs, including the new **Recommend Stocks** scanner.
+    * **New Feature:** Implemented a `get_recommendations()` engine that scans a preset list of high-volume stocks.
+    * **Market Logic:** Added 5-day, **Month-to-Date (MTD)**, and **Year-to-Date (YTD)** performance calculations for broad market context.
+    * **Strategy Integration:** Applied a multi-layer entry target system for each recommendation:
+        * **PS Limit I & II** (Volatility-based targets).
+        * **EMA 20 & EMA 50** (Institutional trend-following targets).
+    * **Tab Architecture:** Expanded the main UI to 4 tabs, including the new **Recommend Stocks** scanner with formatted data tables.
 
 ---
 

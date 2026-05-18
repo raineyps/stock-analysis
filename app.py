@@ -89,20 +89,47 @@ def get_recommendations():
     # Predefined list of popular tickers
     tickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'META', 'NVDA', 'NFLX', 'AMD', 'PYPL', 'DIS', 'ADBE', 'CRM', 'INTC', 'SBUX', 'V', 'MA', 'AVGO', 'COST', 'JPM']
     try:
-        # Fetch 5 days of data for all tickers
-        data = yf.download(tickers, period="5d", interval="1d", group_by='ticker')
+        # Fetch data for all tickers (1y to cover YTD and EMAs)
+        data = yf.download(tickers, period="1y", interval="1d", group_by='ticker')
         recommendations = []
         
+        # Calculate dates for MTD and YTD
+        today = datetime.now()
+        first_day_month = today.replace(day=1)
+        first_day_year = today.replace(month=1, day=1)
+
         for ticker in tickers:
             try:
                 if ticker not in data.columns.levels[0]: continue
                 ticker_data = data[ticker].dropna()
-                if len(ticker_data) < 2: continue
+                if len(ticker_data) < 50: continue # Need at least 50 days for EMA 50
                 
-                # Latest performance (5-day return)
-                start_price = float(ticker_data['Close'].iloc[0])
+                # Latest Close
                 end_price = float(ticker_data['Close'].iloc[-1])
-                perf = ((end_price - start_price) / start_price) * 100
+                
+                # 5-day performance
+                start_price_5d = float(ticker_data['Close'].iloc[-5]) if len(ticker_data) >= 5 else float(ticker_data['Close'].iloc[0])
+                perf_5d = ((end_price - start_price_5d) / start_price_5d) * 100
+                
+                # MTD performance
+                mtd_data = ticker_data[ticker_data.index >= first_day_month.strftime('%Y-%m-%d')]
+                if not mtd_data.empty:
+                    start_price_mtd = float(mtd_data['Close'].iloc[0])
+                    perf_mtd = ((end_price - start_price_mtd) / start_price_mtd) * 100
+                else:
+                    perf_mtd = 0.0
+
+                # YTD performance
+                ytd_data = ticker_data[ticker_data.index >= first_day_year.strftime('%Y-%m-%d')]
+                if not ytd_data.empty:
+                    start_price_ytd = float(ytd_data['Close'].iloc[0])
+                    perf_ytd = ((end_price - start_price_ytd) / start_price_ytd) * 100
+                else:
+                    perf_ytd = 0.0
+                
+                # EMAs
+                ema_20 = ticker_data['Close'].ewm(span=20, adjust=False).mean().iloc[-1]
+                ema_50 = ticker_data['Close'].ewm(span=50, adjust=False).mean().iloc[-1]
                 
                 # PS Limit Buy Logic
                 today_open = float(ticker_data['Open'].iloc[-1])
@@ -115,18 +142,22 @@ def get_recommendations():
                 
                 recommendations.append({
                     "Ticker": ticker,
-                    "5D Perf %": perf,
+                    "5D %": perf_5d,
+                    "MTD %": perf_mtd,
+                    "YTD %": perf_ytd,
                     "Price": end_price,
                     "Limit I": limit_i,
-                    "Limit II": limit_ii
+                    "Limit II": limit_ii,
+                    "EMA 20": ema_20,
+                    "EMA 50": ema_50
                 })
             except:
                 continue
             
-        # Sort by performance and take top 10
+        # Sort by 5D performance and take top 10
         df_rec = pd.DataFrame(recommendations)
         if not df_rec.empty:
-            df_rec = df_rec.sort_values(by="5D Perf %", ascending=False).head(10)
+            df_rec = df_rec.sort_values(by="5D %", ascending=False).head(10)
         return df_rec
     except Exception as e:
         return pd.DataFrame() # Return empty DF on error
@@ -290,7 +321,7 @@ if symbol:
 
         with tab4:
             st.subheader("🚀 Recommended Stocks")
-            st.write("Top 10 performers from a selection of high-volume stocks (last 5 days) with calculated limit buy targets.")
+            st.write("Top 10 performers (last 5 days) with Month-to-Date (MTD), Year-to-Date (YTD) performance and multiple buy targets.")
             
             with st.spinner("Analyzing market opportunities..."):
                 rec_df = get_recommendations()
@@ -298,13 +329,17 @@ if symbol:
             if not rec_df.empty:
                 # Formatting for display
                 display_df = rec_df.copy()
-                display_df['5D Perf %'] = display_df['5D Perf %'].map("{:,.2f}%".format)
+                display_df['5D %'] = display_df['5D %'].map("{:,.2f}%".format)
+                display_df['MTD %'] = display_df['MTD %'].map("{:,.2f}%".format)
+                display_df['YTD %'] = display_df['YTD %'].map("{:,.2f}%".format)
                 display_df['Price'] = display_df['Price'].map("${:,.2f}".format)
                 display_df['Limit I'] = display_df['Limit I'].map("${:,.2f}".format)
                 display_df['Limit II'] = display_df['Limit II'].map("${:,.2f}".format)
+                display_df['EMA 20'] = display_df['EMA 20'].map("${:,.2f}".format)
+                display_df['EMA 50'] = display_df['EMA 50'].map("${:,.2f}".format)
                 
                 st.table(display_df)
-                st.info("💡 **Tip:** Limit I and Limit II are calculated based on the PS strategy logic shown in the 'PS's Analysis' tab.")
+                st.info("💡 **Tip:** Buy targets include the PS strategy (Limit I/II) and technical supports (EMA 20/50).")
             else:
                 st.error("Could not fetch recommendations at this time.")
 

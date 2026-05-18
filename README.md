@@ -15,7 +15,7 @@ A professional-grade financial analysis web application built with **Streamlit**
 *   **Interactive Visualizations:** High-fidelity Candlestick and technical charts using `Plotly`.
 *   **Performance Optimized:** Integrated `@st.cache_data` for efficient data fetching and responsive UI.
 *   **PS's Analysis:** A proprietary trading module that calculates custom entry limits and simulates "New Average Cost" for portfolio scaling.
-*   **Recommend Stocks:** An automated scanner that identifies top-performing stocks (last 5 days) and provides instant strategy-based buy targets.
+*   **Recommend Stocks:** An automated scanner that identifies top-performing stocks (last 5 days) with MTD/YTD performance context and multi-layer buy targets (PS Strategy + EMAs).
 
 ## 🛠️ Local Setup
 
