@@ -154,10 +154,8 @@ def get_recommendations():
             except:
                 continue
             
-        # Sort by 5D performance and take top 10
+        # Return full dataframe of recommendations
         df_rec = pd.DataFrame(recommendations)
-        if not df_rec.empty:
-            df_rec = df_rec.sort_values(by="5D %", ascending=False).head(10)
         return df_rec
     except Exception as e:
         return pd.DataFrame() # Return empty DF on error
@@ -321,25 +319,43 @@ if symbol:
 
         with tab4:
             st.subheader("🚀 Recommended Stocks")
-            st.write("Top 10 performers (last 5 days) with Month-to-Date (MTD), Year-to-Date (YTD) performance and multiple buy targets.")
+            st.write("Analyze and rank top performers with strategy-based buy targets. Targets **above** current price are greyed out.")
             
-            with st.spinner("Analyzing market opportunities..."):
+            # Sorting Selection
+            sort_col = st.radio("Rank by performance:", ["5D %", "MTD %", "YTD %"], horizontal=True)
+            
+            with st.spinner(f"Analyzing market opportunities by {sort_col}..."):
                 rec_df = get_recommendations()
             
             if not rec_df.empty:
-                # Formatting for display
-                display_df = rec_df.copy()
-                display_df['5D %'] = display_df['5D %'].map("{:,.2f}%".format)
-                display_df['MTD %'] = display_df['MTD %'].map("{:,.2f}%".format)
-                display_df['YTD %'] = display_df['YTD %'].map("{:,.2f}%".format)
-                display_df['Price'] = display_df['Price'].map("${:,.2f}".format)
-                display_df['Limit I'] = display_df['Limit I'].map("${:,.2f}".format)
-                display_df['Limit II'] = display_df['Limit II'].map("${:,.2f}".format)
-                display_df['EMA 20'] = display_df['EMA 20'].map("${:,.2f}".format)
-                display_df['EMA 50'] = display_df['EMA 50'].map("${:,.2f}".format)
+                # Sort based on user selection
+                display_df = rec_df.sort_values(by=sort_col, ascending=False).head(10).copy()
                 
-                st.table(display_df)
-                st.info("💡 **Tip:** Buy targets include the PS strategy (Limit I/II) and technical supports (EMA 20/50).")
+                # Conditional Styling Function
+                def style_buys(val, current_price):
+                    if val > current_price:
+                        return 'color: #888888; text-decoration: line-through;'
+                    return ''
+
+                # We apply styling to specific columns
+                styled_df = display_df.style.apply(
+                    lambda row: [
+                        style_buys(row[col], row['Price']) if col in ['Limit I', 'Limit II', 'EMA 20', 'EMA 50'] else ''
+                        for col in row.index
+                    ], axis=1
+                ).format({
+                    "5D %": "{:,.2f}%",
+                    "MTD %": "{:,.2f}%",
+                    "YTD %": "{:,.2f}%",
+                    "Price": "${:,.2f}",
+                    "Limit I": "${:,.2f}",
+                    "Limit II": "${:,.2f}",
+                    "EMA 20": "${:,.2f}",
+                    "EMA 50": "${:,.2f}"
+                })
+                
+                st.dataframe(styled_df, use_container_width=True, height=400)
+                st.info(f"💡 **Tip:** Ranked by **{sort_col}**. Greyed-out targets with strikethrough are currently above the market price.")
             else:
                 st.error("Could not fetch recommendations at this time.")
 

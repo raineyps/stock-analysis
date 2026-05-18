@@ -92,14 +92,16 @@ The engine includes a dynamic calculator to predict the "New Average Cost" befor
 
 ### **Iteration 6: Automated Market Scanning (Current)**
 
-* **Prompt:** Add a "Recommend Stocks" tab for top 10 performance ranking with MTD/YTD context and multi-layer buy parameters (PS Strategy + EMA 20/50).
+* **Prompt:** Add a "Recommend Stocks" tab for top 10 performance ranking with interactive sorting and visual feedback for buy targets.
 * **Updates:**
     * **New Feature:** Implemented a `get_recommendations()` engine that scans a preset list of high-volume stocks.
     * **Market Logic:** Added 5-day, **Month-to-Date (MTD)**, and **Year-to-Date (YTD)** performance calculations for broad market context.
-    * **Strategy Integration:** Applied a multi-layer entry target system for each recommendation:
-        * **PS Limit I & II** (Volatility-based targets).
-        * **EMA 20 & EMA 50** (Institutional trend-following targets).
-    * **Tab Architecture:** Expanded the main UI to 4 tabs, including the new **Recommend Stocks** scanner with formatted data tables.
+    * **Interactive UI:** Integrated a **dynamic sorting system** allowing users to rank the top 10 stocks by 5D, MTD, or YTD performance in real-time.
+    * **Strategy Integration:** Applied a multi-layer entry target system for each recommendation (PS Limits + EMAs).
+    *   **Visual Feedback:** Developed a **Conditional Styling Engine** using `pandas.style` that:
+        *   **Greys out and strikes through** any buy target that is already higher than the current price (not an active "dip").
+        *   Maintains standard styling for active targets below current market price for a clean analytical look.
+    * **Tab Architecture:** Expanded the main UI to 4 tabs, including the new **Recommend Stocks** scanner with styled interactive dataframes.
 
 ---
 
