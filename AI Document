@@ -77,7 +77,7 @@ The engine includes a dynamic calculator to predict the "New Average Cost" befor
     * **Visual Refinement:** Custom-styled Metric Cards with a high-contrast theme (#F0F8FF background with black text) for maximum readability.
     * **Compliance:** Added a dedicated **Educational Warning** banner to the proprietary strategy module.
 
-### **Iteration 5: Advanced Logic & UI Feedback (Current)**
+### **Iteration 5: Advanced Logic & UI Feedback**
 
 * **Prompt:** Refine PS entry logic, add tooltips, and implement visual indicators for average cost comparisons.
 * **Updates:**
@@ -90,7 +90,14 @@ The engine includes a dynamic calculator to predict the "New Average Cost" befor
         * Developed **Dynamic Trend Indicators** (arrows and colors) for the "New Average Cost" display.
         * Expanded average cost simulation to include **ATR/EMA Entry Targets**.
 
+### **Iteration 6: Automated Market Scanning (Current)**
 
+* **Prompt:** Add a "Recommend Stocks" tab for top 10 performance ranking and limit buy parameters.
+* **Updates:**
+    * **New Feature:** Implemented a `get_recommendations()` engine that scans a preset list of high-volume stocks (AAPL, MSFT, NVDA, etc.).
+    * **Market Logic:** Added a 5-day performance calculation to rank and display the top 10 "movers."
+    * **Strategy Integration:** Applied the **PS Limit Buy I & II** formulas to each recommended stock to provide instant, actionable entry targets.
+    * **Tab Architecture:** Expanded the main UI to 4 tabs, including the new **Recommend Stocks** scanner.
 
 ---
 

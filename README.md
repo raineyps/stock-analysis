@@ -15,6 +15,7 @@ A professional-grade financial analysis web application built with **Streamlit**
 *   **Interactive Visualizations:** High-fidelity Candlestick and technical charts using `Plotly`.
 *   **Performance Optimized:** Integrated `@st.cache_data` for efficient data fetching and responsive UI.
 *   **PS's Analysis:** A proprietary trading module that calculates custom entry limits and simulates "New Average Cost" for portfolio scaling.
+*   **Recommend Stocks:** An automated scanner that identifies top-performing stocks (last 5 days) and provides instant strategy-based buy targets.
 
 ## 🛠️ Local Setup
 
@@ -50,10 +51,11 @@ The core libraries used in this project are:
 *   `plotly` - Interactive charts
 
 ## 📊 Strategy Logic: PS's Analysis
-The dashboard includes a specialized section for personal strategy evaluation, organized into three tabs:
+The dashboard includes a specialized section for personal strategy evaluation, organized into four tabs:
 1.  **Overview:** Real-time metrics and price action chart.
 2.  **Technicals:** Detailed RSI and MACD analysis.
 3.  **PS's Analysis:** Strategy-based entry targets and cost-averaging simulator.
+4.  **Recommend Stocks:** Automated top 10 performance scanner with integrated buy targets.
 
 ### Entry Targets
 *   **PS Limit I:** Today's Open adjusted by the percentage change between Yesterday's Open and Yesterday's Low.
